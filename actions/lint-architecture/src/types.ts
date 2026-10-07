@@ -13,3 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export interface ValidationResult {
+  isValid: boolean;
+  result: string | null;
+}
+
+export interface ParsedPackage {
+  name?: string;
+  [key: string]: any;
+}

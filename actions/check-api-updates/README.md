@@ -1,6 +1,7 @@
 # Check API Updates
 
 > [!WARNING]
+> This action is not yet implemented. The shape of it is not currently clear.
 > This action is specific to the `drivers` repository and not intended to be used in other AI Crew Suite repositories.
 
 ## Overview
