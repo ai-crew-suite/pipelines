@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect } from 'vitest';
-import { buildPlans, parseLabels } from '../src/planner.js';
+import { buildPlans, parseLabels } from '../planner.js';
 
 describe('sync planner', () => {
   const sourceRoot = '/infra/src';

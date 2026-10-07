@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { run } from '../src/main';
+import { run } from '../main';
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { readConfig } from '../src/config.js';
-import { loadConfig } from '../src/loader.js';
-import { buildPlans } from '../src/planner.js';
-import { syncRepository } from '../src/git.js';
+import { readConfig } from '../config.js';
+import { loadConfig } from '../loader.js';
+import { buildPlans } from '../planner.js';
+import { syncRepository } from '../git.js';
 
 vi.mock('@actions/core', () => ({
   info: vi.fn(),

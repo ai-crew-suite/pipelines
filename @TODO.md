@@ -10,7 +10,11 @@ Could not find a declaration file for module '@ai-crew-suite/crew-cli/config/esl
 
 3. Tests missing on various scripts
 
-4. Build issues:
+4. Fix scripts in all actions package.json files
+
+5. Need to add "actions" to the crew cli in addition to its "plugins" and "packages" paths so we can use crew cli commands like lint in this repo
+
+6. Build issues:
 
 ***\*Strategy B\**** is the industry standard for open-source and professional GitHub Actions (used by GitHub themselves) because it ensures developers don't have to review massive, minified `dist/index.js` blobs in their Pull Requests.
 

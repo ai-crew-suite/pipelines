@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { readConfig } from '../src/config';
+import { readConfig } from '../config';
 import * as core from '@actions/core';
 
 vi.mock('@actions/core', () => ({
@@ -48,7 +48,7 @@ describe('readConfig()', () => {
     vi.mocked(core.getInput).mockImplementation((name) => {
       if (name === 'static_files_path') return 'src';
       if (name === 'GH_PAT') return 'ghp_token';
-      if (name === 'PR_LABELS') return '  infra, bug\n feature ,, system '; 
+      if (name === 'PR_LABELS') return '  infra, bug\n feature ,, system ';
       return '';
     });
 

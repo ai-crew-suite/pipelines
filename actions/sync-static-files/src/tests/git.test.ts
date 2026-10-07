@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { syncRepository, repositoryUrl, copyFile, runGit } from '../src/git';
+import { syncRepository, repositoryUrl, copyFile, runGit } from '../git';
 import * as fsPromises from 'node:fs/promises';
 import * as fs from 'node:fs';
 import { execFile } from 'node:child_process';
-import type { RepositoryPlan } from '../src/types';
+import type { RepositoryPlan } from '../types';
 
 // Mock node core modules
 vi.mock('node:child_process', () => ({

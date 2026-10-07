@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { loadConfig } from '../src/loader';
+import { loadConfig } from '../loader';
 import { createJiti } from 'jiti';
 import { resolve } from 'node:path';
 
