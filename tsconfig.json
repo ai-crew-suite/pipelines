@@ -1,30 +1,23 @@
 {
-  "$schema": "https://schemastore.org",
-  "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true,
-    "isolatedModules": true,
-    "lib": ["ES2022"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "outDir": "${configDir}/dist",
-    "resolveJsonModule": true,
-    "rootDir": "${configDir}/src",
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "ES2022",
-    "types": ["node"]
-  },
-  "include": [
-    "${configDir}/src/**/*",
-    "${configDir}/@types/**/*"
+  "extends": "@ai-crew-suite/typescript-shared-config/node",
+  "files": [],
+  "references": [
+    { "path": "./actions/analyze-codeql" },
+    { "path": "./actions/analyze-trivy" },
+    { "path": "./actions/bypass-dependency-review" },
+    { "path": "./actions/bypass-playwright-tests" },
+    { "path": "./actions/changeset-pr-controller" },
+    { "path": "./actions/changeset-sync" },
+    { "path": "./actions/check-api-updates" },
+    { "path": "./actions/check-backstage-dependency-version" },
+    { "path": "./actions/close-stale-items" },
+    { "path": "./actions/enforce-branch-protection" },
+    { "path": "./actions/lint-architecture" },
+    { "path": "./actions/publish-package" },
+    { "path": "./actions/run-ci" },
+    { "path": "./actions/run-dependency-review" },
+    { "path": "./actions/run-playwright-tests" },
+    { "path": "./actions/sync-eslint-config" },
+    { "path": "./actions/sync-static-files" }
   ]
 }

@@ -2,60 +2,38 @@
   "name": "@ai-crew-suite/pipelines",
   "description": "GitHub Actions package for the AI Crew Suite repos",
   "license": "Apache-2.0",
-  "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "22 || 24"
+    "node": "22 || 24",
+    "npm": "Please use Yarn instead (Corepack enable)"
   },
-  "packageManager": "yarn@4.18.0",
-  "workspaces": [
-    "automate-stale",
-    "changeset",
-    "ci",
-    "codeql",
-    "dependency-review-bypass",
-    "dependency-review-check",
-    "eslint-config-sync",
-    "lint-architecture",
-    "playwright-bypass",
-    "playwright-run",
-    "publish",
-    "sync-static-files",
-    "weekly-check-versions",
-    "validate-branch"
-  ],
+  "packageManager": "yarn@4.18.1",
   "type": "module",
+  "workspaces": [
+    "actions/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "clean": "turbo clean",
     "format": "prettier --write \"**/*.{json,md,css,ts,js}\"",
-    "lint": "lint:actions && lint:typescript",
-    "lint:actions": "turbo lint:actions",
-    "lint:typescript": "turbo lint:typescript",
+    "install:setup": "husky",
+    "lint": "yarn lint:actions && yarn lint:typescript",
+    "lint:actions": "yarn turbo lint:actions",
+    "lint:typescript": "yarn turbo lint:typescript",
     "sync": "crew sync:refs",
-    "test": "yarn test:unit",
+    "test": "yarn turbo test:unit",
+    "test:integration": "yarn turbo run test:integration",
     "test:unit": "turbo test:unit",
-    "test:unit:coverage": "turbo run test:unit:coverage",
-    "typecheck": "turbo typecheck",
-    "typecheck:full": "turbo typecheck --force",
+    "test:unit:coverage": "yarn turbo run test:unit:coverage",
+    "typecheck": "yarn turbo typecheck",
+    "typecheck:full": "yarn turbo typecheck --force",
     "version": "changeset version && yarn install"
   },
-  "lint-staged": {
-    "*.{js,ts}": [
-      "eslint --fix"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
-  },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "all",
-    "printWidth": 100
-  },
   "devDependencies": {
+    "@ai-crew-suite/crew-cli": "catalog:dev",
+    "@ai-crew-suite/typescript-shared-config": "catalog:dev",
     "@changesets/cli": "catalog:dev",
-    "@tsconfig/node24": "catalog:dev",
+    "@tsconfig/node22": "catalog:dev",
     "@types/node": "catalog:dev",
     "@typescript-eslint/eslint-plugin": "catalog:dev",
     "@typescript-eslint/parser": "catalog:dev",
@@ -68,5 +46,16 @@
     "typescript": "catalog:dev",
     "vite": "catalog:dev",
     "vitest": "catalog:dev"
+  },
+  "resolutions": {
+    "got": "11.8.6"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   }
 }

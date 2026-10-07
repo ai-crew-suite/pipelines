@@ -1,0 +1,56 @@
+name: 'Automated Changeset Synchronization'
+description: 'Validates workspace states, auto-generates changesets for automated pipelines, and commits changes.'
+
+inputs:
+  github_token:
+    description: 'Elevated PAT or App installation token to push commits back to protected branches'
+    required: true
+  commit_message:
+    description: 'The commit string used when syncing structural changesets'
+    required: false
+    default: 'chore: automated changeset sync [skip ci]'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 🔍 Audit Changeset Presence
+      id: changeset-audit
+      shell: bash
+      run: |
+        if npx changeset status > /dev/null 2>&1; then
+          echo "has_changeset=true" >> $GITHUB_OUTPUT
+          echo "✅ Active changeset documented by contributor."
+        else
+          echo "has_changeset=false" >> $GITHUB_OUTPUT
+          echo "⚠️ No changeset located. Initializing automated fallback."
+        fi
+
+    - name: 🦋 Generate Fallback Changeset
+      if: steps.changeset-audit.outputs.has_changeset == 'false'
+      shell: bash
+      run: |
+        # Generates an empty changeset to allow pipelines to continue without throwing errors
+        npx changeset --empty
+        echo "✨ Fallback configuration applied."
+
+    - name: 📤 Push Generated Files back to Branch
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
+        # Only proceed if changes exist on disk
+        if [ -n "$(git status --porcelain .changeset)" ]; then
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .changeset/*
+          git commit -m "${{ inputs.commit_message }}"
+
+          # Extracts current branch name securely whether running on PR or direct push
+          BRANCH_REF="${{ github.head_ref || github.ref_name }}"
+
+          echo "Pushing updates directly back into branch tracking line: $BRANCH_REF"
+          git push origin HEAD:$BRANCH_REF
+        else
+          echo "No internal formatting or state drifts caught. Workspace is fully synchronized."
+        fi

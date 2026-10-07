@@ -1,0 +1,54 @@
+name: 'CodeQL Repository Security Scanner'
+description: 'Centralized organization engine for CodeQL application analysis with automatic hotfix bypassing.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: ℹ️ Check for Hotfix Branch
+      id: check-hotfix
+      shell: bash
+      run: |
+        REF_NAME="${{ github.head_ref || github.ref_name }}"
+        if [[ "$REF_NAME" =~ ^hotfix/ ]]; then
+          echo "is_hotfix=true" >> $GITHUB_OUTPUT
+          echo "🚀 Hotfix branch detected ($REF_NAME). Security engine will bypass scanning for this run."
+        else
+          echo "is_hotfix=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: 📂 Initialize CodeQL Core Analysis Engines
+      if: steps.check-hotfix.outputs.is_hotfix != 'true'
+      uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+      with:
+        languages: ${{ inputs.language }}
+        queries: +security-and-quality
+        config: |
+          name: "Centralized CodeQL Configuration"
+          disable-default-queries: false
+          paths:
+            - "packages"
+            - "plugins"
+            - "scripts"
+            - "test"
+            - "actions"
+          paths-ignore:
+            - "**/node_modules"
+            - "**/dist"
+            - "**/dist-types"
+            - "**/.turbo"
+            - "**/.yarn"
+
+    - name: 🛠️ Autobuild Source Targets
+      if: inputs.language == 'javascript' && steps.check-hotfix.outputs.is_hotfix != 'true'
+      uses: github/codeql-action/autobuild@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+
+    - name: 🔎 Perform CodeQL Analysis Matrix Passes
+      if: inputs.language == 'javascript' && steps.check-hotfix.outputs.is_hotfix != 'true'
+      uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+      with:
+        category: "/language:${{ inputs.language }}"
+
+    - name: ✅ Confirm Hotfix Bypass Execution
+      if: steps.check-hotfix.outputs.is_hotfix == 'true'
+      shell: bash
+      run: echo "Bypass approved. CodeQL scanning skipped to prevent blocking deployment workflows."

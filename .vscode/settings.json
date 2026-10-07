@@ -1,103 +1,40 @@
 {
-  "eslint.nodePath": ".yarn/sdks",
-  "files.associations": {
-    "**/actions/**/action.yaml": "yaml",
-    "**/actions/**/action.yml": "yaml"
+  "cSpell.customDictionaries": {
+    "org-words": {
+      "path": "./.cspell/shared.txt",
+      "addWords": false
+    }
   },
-  "js/ts.tsdk.path": ".yarn/sdks/typescript/lib",
-  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
-  "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "json.schemas": [
+    {
+      "fileMatch": [".yarnrc.yml"],
+      "url": "https://yarnpkg.com/configuration/yarnrc.json"
+    }
+  ],
+  "json.schemaDownload.trustedDomains": {
+    "https://*.turborepo.dev": true
+  },
   "search.exclude": {
     "**/.yarn": true,
-    "**/.pnp.*": true
+    "**/node_modules": true,
+    "**/.turbo": true,
+    "**/dist": true,
+    "**/.cache": true,
+    "**/coverage": true
   },
   "yaml.schemas": {
-    "https://backstage.io": "app-config*.yaml"
+    "https://json.schemastore.org/catalog-info.json": [
+      "**/catalog-info.yaml",
+      "master-catalogs.yml"
+    ]
   },
-  "ts.tsdk": "node_modules/typescript/lib",
-  "ts.enablePromptUseWorkspaceTsdk": true,
+  "yaml.validate": true,
   "cSpell.words": [
-    "Accum",
-    "actioned",
-    "agentic",
-    "AKIA",
-    "arounds",
-    "azdev",
-    "azuredevops",
-    "baprs",
-    "Contextualizer",
-    "creds",
-    "demultiplexing",
-    "ehthumbs",
-    "entitites",
-    "exfiltration",
-    "Fazure",
     "FINRA",
-    "glpat",
-    "hdrs",
-    "healthz",
-    "HITL",
-    "IDOR",
-    "Ilshidur",
-    "incidentio",
-    "Injectively",
-    "jiti",
-    "jsdom",
-    "jsons",
-    "llms",
-    "Milvus",
-    "msgpackr",
-    "nektos",
-    "nvmrc",
-    "Ollama",
-    "oncalls",
-    "oriflame",
-    "ossp",
-    "PABC",
-    "pgvector",
-    "PINC",
-    "PNOTE",
-    "PPOL",
-    "PPRI",
-    "PSVC",
-    "PTEAM",
-    "PUSR",
-    "pylint",
-    "Qdrant",
-    "repudiable",
-    "rerank",
-    "Reranker",
-    "rerankers",
-    "rharkor",
-    "rjsf",
-    "roadiehq",
-    "SCAF",
-    "scoree",
-    "smhd",
-    "sonarqube",
-    "SPOF",
-    "stringifying",
-    "unbuilt",
-    "uncited",
-    "uncompiled",
-    "unconfigured",
-    "unestimated",
-    "ungated",
-    "unparseable",
-    "unposted",
-    "unredacted",
-    "Unrouted",
-    "unsourced",
-    "unstub",
-    "untimed",
-    "upserts",
-    "Vercel",
-    "vite",
-    "westus",
-    "xlarge",
-    "xoxb",
-    "xoxp",
-    "yarnrc",
-    "zipfs"
+    "sarif"
   ]
 }

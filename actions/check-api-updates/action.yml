@@ -1,0 +1,52 @@
+name: Check Upstream OpenAPI Updates
+description: Tracks upstream specifications and creates automated PRs if changes exist.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        yarn install --immutable
+        yarn add -D tsx
+
+    - name: Run Update Checker
+      id: check_specs
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        npx tsx scripts/check-upstream-specs.ts
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "HAS_UPDATES=true" >> $GITHUB_OUTPUT
+        else
+          echo "HAS_UPDATES=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Read PR Description
+      if: steps.check_specs.outputs.HAS_UPDATES == 'true'
+      id: pr_body
+      shell: bash
+      run: |
+        echo "BODY<<EOF" >> $GITHUB_OUTPUT
+        cat issue_body.md >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Create Pull Request
+      if: steps.check_specs.outputs.HAS_UPDATES == 'true'
+      uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+      with:
+        token: ${{ github.token }}
+        commit-message: "chore(deps): bump upstream openapi specifications"
+        branch: automation/openapi-spec-updates
+        title: "🔄 chore(deps): upstream openapi spec updates detected"
+        body: ${{ steps.pr_body.outputs.BODY }}
+        labels: |
+          dependencies
+          automated-pr

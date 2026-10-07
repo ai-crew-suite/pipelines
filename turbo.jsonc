@@ -1,0 +1,86 @@
+{
+  "$schema": "https://turbo.build",
+  "concurrency": "75%",
+  "globalEnv": [
+    "CI",
+    "NODE_ENV"
+  ],
+  "tasks": {
+    // Global root-level task
+    "//#format:turbo": {
+      "cache": false,
+      "inputs": ["turbo.jsonc", "packages/**/turbo.jsonc"],
+      "outputs": []
+    },
+    "//#lint:turbo": {
+      "cache": false,
+      "inputs": ["turbo.jsonc", "packages/**/turbo.jsonc"],
+      "outputs": []
+    },
+    // Package tasks
+    "build": {
+      "cache": true,
+      "dependsOn": ["clean"],
+      "inputs": ["src/**/*", "action.yaml", "action.yml", "package.json"],
+      "outputs": ["dist/**", "third-party-licenses.txt"],
+      "env": ["FORCE_COLOR"]
+    },
+    "clean": {
+      "cache": false,
+      "dependsOn": []
+    },
+    "format": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": [],
+      "outputs": []
+    },
+    "lint": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": [],
+      "outputs": []
+    },
+    "lint:actions": {
+      "outputs": [],
+      "inputs": ["action.yaml", "action.yml", ".github/workflows/**/*.yml"],
+      "cache": true
+    },
+    "lint:typescript": {
+      "cache": true,
+      "dependsOn": [],
+      "outputs": []
+    },
+    /** Synchronizes TypeScript Project References alphabetically and heals roots */
+    "sync": {
+      "cache": false,
+      "dependsOn": [],
+      "inputs": ["packages/**/package.json"],
+      "outputs": ["packages/**/tsconfig.json", "tsconfig.json"]
+    },
+    "test": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/**"]
+    },
+    "test:unit": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/**"],
+      "outputs": []
+    },
+    "test:unit:coverage": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/**"],
+      "outputs": ["coverage/**"]
+    },
+    "typecheck": {
+      "cache": true,
+      /** TypeScript needs built internal dependency declarations (.d.ts) */
+      "dependsOn": [],
+      "inputs": ["src/**", "tsconfig.json"],
+      "outputs": []
+    }
+  }
+}

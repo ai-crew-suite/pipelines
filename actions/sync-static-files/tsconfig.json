@@ -1,0 +1,10 @@
+{
+  "extends": "@ai-crew-suite/typescript-shared-config/node",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler"
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
