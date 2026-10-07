@@ -131,7 +131,9 @@ describe('sync planner', () => {
 
       const plans = buildPlans(config as any, sourceRoot);
       expect(plans).toHaveLength(1);
-      expect(plans[0].name).toBe('infra');
+
+      const targetPlan = plans?.[0];
+      expect(targetPlan?.name).toBe('infra');
     });
   });
 });

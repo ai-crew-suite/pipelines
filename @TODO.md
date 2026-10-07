@@ -1,26 +1,18 @@
 # TODOs
 
-1. The `foundry` eslint config is missing types:
+- `check-api-updates` need implementation
 
-```bash
-Could not find a declaration file for module '@ai-crew-suite/crew-cli/config/eslint'. '/home/kevin/Repos/ai-crew-suite/pipelines/node_modules/@ai-crew-suite/crew-cli/dist/bin/commands/lint/config/factory.js' implicitly has an 'any' type. Try `npm i --save-dev @types/ai-crew-suite__crew-cli` if it exists or add a new declaration (.d.ts) file containing `declare module '@ai-crew-suite/crew-cli/config/eslint';`
-```
+- Fix scripts in all actions package.json files
 
-2. `check-api-updates` need implementation
+- `yarn typecheck` ends up in a forever loop
 
-3. Tests missing on various scripts
-
-4. Fix scripts in all actions package.json files
-
-5. Need to add "actions" to the crew cli in addition to its "plugins" and "packages" paths so we can use crew cli commands like lint in this repo
-
-6. Build issues:
+- Build issues:
 
 ***\*Strategy B\**** is the industry standard for open-source and professional GitHub Actions (used by GitHub themselves) because it ensures developers don't have to review massive, minified `dist/index.js` blobs in their Pull Requests.
 
 When you use this strategy, you maintain a **clean development branch** (where `dist/` is gitignored) and an **automated release tag** (where `dist/` is bundled and committed).
 
-### How the Workflow Functions Behind the Scenes
+## How the Workflow Functions Behind the Scenes
 
 Whenever a developer cuts a release tag or updates a major version branch, an automated workflow takes over:
 
