@@ -17,18 +17,19 @@ import { setFailed, info, warning, getInput } from '@actions/core';
 import * as github from '@actions/github';
 
 export function findSuccessForSha(runs: any[], expectedSha: string): boolean {
-  for (const workflowRun of runs) {
-    if (!workflowRun || workflowRun.head_sha !== expectedSha) {
-      continue;
-    }
-    return workflowRun.conclusion === 'success';
-  }
-  return false;
+  const matchingRuns = runs.filter(wRun => wRun && wRun.head_sha === expectedSha);
+  if (matchingRuns.length === 0) return false;
+
+  // Since GitHub Actions APIs return data sorted chronologically (newest first),
+  // the first matching element is the absolute latest status of the commit execution.
+  return matchingRuns[0].conclusion === 'success';
 }
 
+/**
+ * Main execution orchestration block for the Playwright Deployment Gatekeeper
+ */
 export async function run(): Promise<void> {
   try {
-    // 1. Gather all inputs using the standard core SDK instead of manual env parsing
     const token = getInput('github_token', { required: true });
     const expectedSha = getInput('expected_sha', { required: true });
     const workflowFile = getInput('workflow_file') || 'playwright.yml';
@@ -38,7 +39,6 @@ export async function run(): Promise<void> {
 
     const preReleaseBypass = getInput('pre_release_bypass') || 'true';
 
-    // 2. Resolve target repository naming matrices natively
     const { owner, repo } = github.context.repo;
     if (!owner || !repo) {
       throw new Error('Could not resolve repository owner or name from context targets.');
@@ -46,7 +46,6 @@ export async function run(): Promise<void> {
 
     info(`🔍 Checking completed runs of '${workflowFile}' in ${owner}/${repo} for SHA: ${expectedSha}...`);
 
-    // 3. Initialize Octokit and fetch completed workflow runs
     const octokit = github.getOctokit(token);
 
     const { data } = await octokit.rest.actions.listWorkflowRuns({
@@ -59,13 +58,11 @@ export async function run(): Promise<void> {
 
     const runs = data.workflow_runs || [];
 
-    // 4. Evaluate the run status and enforce gates
     if (findSuccessForSha(runs, expectedSha)) {
       info('✅ Playwright succeeded for this SHA');
       return;
     }
 
-    // Handle early development pre-release bypass conditions
     if (preReleaseBypass.toLowerCase() === 'true') {
       warning(`⚠️ WARNING: Playwright has not completed successfully for SHA ${expectedSha}!`);
       warning('⚠️ [EARLY DEVELOPMENT BYPASS] Allowing deployment anyway. Remember to enforce this check later.');
