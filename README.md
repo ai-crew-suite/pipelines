@@ -5,7 +5,7 @@
 AI Crew Suite is a Backstage plugin workspace for building retrieval-augmented, tool-using AI agents inside a developer portal. This repo includes common GitHub Actions to use in all project repos for CI/CD.
 
 > [!WARNING]
-> This repo is pre-beta and under going heavy development as of October, 2026. We are refactoring from LangGraph to a fluent API for workflows in agentic plugins based on Temporal + Mem0 Vercel AI SDK.
+> Actions with scripts do not support using `main` as a version pointer at call sites (e.g., `uses: ai-crew-suite/pipelines/actions/lint-architecture@main`). It will **fail** because `dist/` does not exist on `main`, it is added to the release tag during CI / CD.
 
 ## 🏗️ Development Workflow
 
@@ -56,15 +56,76 @@ yarn turbo run publish
 - Proxies `yarn changeset publish` to orchestrate multi-package version increments.
 - Integrates seamlessly with the npm/Yarn lifecycle hooks (`prepack` / `postpack`) declared inside individual frontend and backend plugins, ensuring distribution tarballs carry fully compiled, production-ready path definitions during registry deployment passes.
 
+## Enterprise Security & Compliance
+
+This repository adheres to strict **FINRA, SOC-2 Type II, and HIPAA** compliance controls for software supply chain security. All actions and pipelines published here are cryptographically signed, immutable, and fully verifiable.
+
+### 🔒 Enterprise Consumption Policy
+
+To satisfy strict change management controls, **downstream enterprise environments must not use floating major tags** (e.g., `@v1`). You must pin all action references to an immutable cryptographic git commit SHA hash, accompanied by a version comment.
+
+```yaml
+# ❌ NON-COMPLIANT (Floating Tag - Fails Change Controls)
+uses: ai-crew-suite/pipelines/actions/lint-architecture@v1
+
+#  COMPLIANT (Pinned Commit SHA - Audit Trail Intact)
+uses: ai-crew-suite/pipelines/actions/lint-architecture@a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0 # v1.2.3
+```
+
+### 📦 Release Mechanism & Immutable Assets
+
+We enforce **SLSA Level 3 Build Provenance**.
+
+1. **No Injected Git Tags:** Production assets are never forcefully committed or injected back into Git tags. Git tags in this repository are strictly write-once, immutable milestones.
+2. **Release Archives:** Production-ready actions (including compiled `dist/` targets, `action.yml`, and documentation) are packaged into an isolated `action-distributable.zip` archive attached directly to the formal [GitHub Release](https://github.com).
+
+### 🛡️ How to Verify Artifact Attestations
+
+Every official release archive is cryptographically signed using **GitHub Artifact Attestations** and logged to the public, tamper-proof Sigstore ledger. This provides mathematically undeniable proof that the zip artifact was generated inside an untampered, official GitHub-hosted runner directly from our open-source commit history.
+
+Before expanding a release asset inside a secure or regulated perimeter, compliance officers and automated deployment pipelines can verify its authenticity using the [GitHub CLI (`gh`)](https://github.com).
+
+#### Verification Steps
+
+1. **Download the Asset:**
+   Download the `action-distributable.zip` package from the target release version.
+
+2. **Run the Verification Command:**
+   Execute the following command in your terminal or deployment workflow to validate the cryptographic chain of custody:
+
+   ```bash
+   gh attestation verify action-distributable.zip --owner ai-crew-suite
+   ```
+
+#### Expected Audit Output
+
+Upon successful verification, the CLI will output a validated cryptographic payload confirming the matching OIDC claims:
+
+```text
+ Loaded 1 attestation from GitHub
+ Loaded 1 trusted certificate from Sigstore Public Good Instance
+ Verification PASSED
+
+Subject SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+Repository:      ai-crew-suite/pipelines
+Workflow:        .github/workflows/release-action.yml
+Trigger:         release
+```
+
+If the file has been tampered with, modified post-build, or compiled outside of our explicit repository workflow, the verification check will fail immediately, halting your pipeline.
+
 ### Force a Tag Version
 
-```bash
-# 1. Force move local v1 tag to your current commit
-git tag -f v1
+> [!DANGER]
+> Never manually force-push tags (`git tag -f`) to GitHub. Bypassing the build pipeline prevents the `dist/` production assets from compiling. This will break actions with scripts for all downstream consumers.
 
-# 2. Force push the updated tag to GitHub
-git push origin v1 -f
-```
+If force-updating an existing version or patch a release without cutting a brand-new semver version is necessary:
+
+1. Navigate to the `Actions` tab in the GitHub UI for this repository.
+2. Select the `Build and Publish Action Release` workflow on the left sidebar.
+3. Click the `Run workflow` dropdown menu.
+4. Select your target development branch and type the exact release tag you want to overwrite (e.g., `v1.2.3`) into the `The target release tag to rebuild` field.
+5. Click `Run workflow` to compile dependencies, attach the `dist/` directory, and safely update both the specific patch tag and the major moving tag (`v1`).
 
 ## 🔊 Get involved
 

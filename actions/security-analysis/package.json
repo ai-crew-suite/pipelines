@@ -1,6 +1,6 @@
 {
-  "name": "@ai-crew-suite/action-bypass-dependency-review",
-  "description": "GitHub Action to bypass the dependency review check",
+  "name": "@ai-crew-suite/action-security-analysis",
+  "description": "Centralized workflow validation mechanics for organization-wide security static analysis passes using CodeQL, Anchore Grype, and Aqua Trivy",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",

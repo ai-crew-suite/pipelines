@@ -6,102 +6,167 @@
 
 - `yarn typecheck` ends up in a forever loop
 
-- Build issues:
+## Open Source Repository Governance Policy
 
-***\*Strategy B\**** is the industry standard for open-source and professional GitHub Actions (used by GitHub themselves) because it ensures developers don't have to review massive, minified `dist/index.js` blobs in their Pull Requests.
+Because you are using a standard organization account without global enterprise-level policy controls, you must enforce the following rules directly inside your repository settings.
 
-When you use this strategy, you maintain a **clean development branch** (where `dist/` is gitignored) and an **automated release tag** (where `dist/` is bundled and committed).
+### Repository Access & Tag Security (FINRA / SOC-2)
 
-## How the Workflow Functions Behind the Scenes
+You must prevent both human developers and automation platforms from altering existing release milestones.
 
-Whenever a developer cuts a release tag or updates a major version branch, an automated workflow takes over:
+- Action: In your GitHub repository, navigate to Settings > Tags > Tag Protection Rules.
+- Rule: Add a rule for `v*` (or `*`).
+- Enforcement: Ensure that no roles—including Repository Administrators—possess the ability to force-push (git push -f) or delete an active tag.
 
-1. It checks out your source code.
-2. It runs `yarn install` and your `ncc build` command to generate the production-ready `dist/` folder.
-3. It **temporarily un-gitignores** the `dist/` folder.
-4. It forcefully commits and pushes that `dist/` folder *only* to the specific release tag or branch.
+### Fork and Pull Request Isolation (HIPAA / SOC-2 Network Security)
 
-This means consumers using `uses: ai-crew-suite/pipelines/actions/lint-architecture@v1` will get a repository state that includes the `dist/index.js` file, while your `main` branch remains clean.
+Public contributors can edit fork code and run it on your organization's runner minutes. If a fork modifies code to leak sensitive deployment values or secrets, it could compromise your organization.
 
-### Step-by-Step Production Workflow Implementation
+- **Action:** Go to **Settings > Actions > General > Fork pull requests**.
+- **Rule:** Select **"Require approval for all outside contributors"**. This forces a team member to manually review the code before a GitHub-hosted runner executes it.
+- **Rule:** Uncheck **"Send secrets to workflows from fork pull requests"** to completely insulate your organizational environment keys.
 
-Create a file in your root directory at `.github/workflows/release-action.yml`. This workflow triggers automatically whenever a new GitHub Release is published.
+### Workflow Permissions Lockdown (Principle of Least Privilege)
+
+By default, standard GitHub repositories give generous write permissions to generic workflow runs.
+
+- **Action:** Go to **Settings > Actions > General > Workflow permissions**.
+- **Rule:** Change the default setting to **"Read repository contents and packages permissions"** (Read-Only).
+- **Impact:** This ensures that unless a workflow explicitly requests `permissions: write` (like our release script above), a malicious dependency or rogue script cannot rewrite your git code or tags.
+
+### Tag Protection Rule Definition (FINRA Anti-Tampering)
+
+Standard organizations do not have branch protection rules for tags by default, making them mutable unless explicitly protected.
+
+- **Action:** Go to **Settings > Tags > Tag Protection Rules > Add rule**.
+- **Pattern:** Input `v*`
+- **Outcome:** Prevents any developer from running `git push origin v1.0.0 --force`, satisfying the SOC-2 immutable version history requirements.
+
+### Mandatory NPM Account Configurations
+
+Auditors checking your company's NPM registry architecture will require proof of protection against account takeover or malicious dependency injection. Configure these fields directly inside your **NPM Organization Dashboard**:
+
+1. **Enforce 2FA for Publish Operations**: Navigate to your NPM organization settings and set the 2FA policy to **"Enforce two-factor authentication for all members"**.
+2. **Configure Automation Tokens**: Ensure that the `NPM_TOKEN` saved inside your GitHub Secrets is explicitly generated as an **"Automation Token"**. Automation tokens bypass the interactive 2FA prompt during automated pipelines while remaining strictly restricted by IP blocks or organization scopes.
+3. **Verify Provenance Badging**: Once published using this updated flow, a public **"Provenance: Verified"** badge will appear on your package page on npmjs.com. This acts as visual evidence for FINRA and SOC-2 auditors that the software supply chain remains uncompromised.
+
+## Moving to AWS Runners with OIDC Trust Boundaries
+
+When you migrate to AWS for your build runners, storing long-lived, static credentials (like an `AWS_ACCESS_KEY_ID`) inside GitHub Secrets is a major **SOC-2 and FINRA violation**. If those keys are leaked or compromised, an attacker gains permanent access to your cloud architecture.
+
+The compliant solution is to establish an **OIDC (OpenID Connect) trust boundary**. This allows GitHub Actions to authenticate directly with AWS Identity and Access Management (IAM) using short-lived, cryptographic tokens that expire automatically after the runner completes its task.
+
+### 1. Configure the Cloud Provider (AWS IAM Setup)
+
+Before updating your workflow, your cloud administrator must create an Identity Provider trust and a dedicated IAM role inside AWS.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:oidc-provider/://githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "://githubusercontent.com:aud": "://amazonaws.com"
+        },
+        "StringLike": {
+          "://githubusercontent.com:sub": "repo:ai-crew-suite/pipelines:*"
+        }
+      }
+    }
+  ]
+}
+```
+
+- **Why this is safe:** The `Condition` block restricts access *exclusively* to workflows running inside your specific GitHub organization and repository (`ai-crew-suite/pipelines`).
+
+### Part 2: Upgraded, Compliance-Hardened Workflow (OIDC + AWS + SBOM)
+
+This updated pipeline brings together everything you requested. It transitions your deployment to **AWS self-hosted runners**, handles **OIDC secure token exchange**, and generates an automated **Software Bill of Materials (SBOM)** using **Anchore Grype** to meet strict regulatory vulnerability scanning requirements.
+
+Replace your `.github/workflows/release-action.yml` file with this production-hardened configuration:
 
 ```yaml
-name: Build and Publish Action Release
+name: Secure Production Release Lifecycle
 
 on:
   release:
     types: [published]
 
+# Enforce strict, minimal permissions to satisfy the Principle of Least Privilege
 permissions:
-  contents: write
+  contents: write       # Required to upload compiled assets to the published release
+  id-token: write       # REQUIRED: For AWS OIDC authentication and Sigstore identity exchange
+  attestations: write   # REQUIRED: Permission to write to the GitHub Attestations store
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
+  audit-and-publish:
+    name: Verify, Compile, Scan, and Attest Action
+    # Migrated from ubuntu-latest to your enterprise AWS self-hosted fleet
+    runs-on: [self-hosted, linux, aws-runner]
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Source Code Traceability
         uses: actions/checkout@v4
         with:
-          # Fetch all history so we can move tags safely
-          fetch-depth: 0 
+          persist-credentials: false 
 
-      - name: Set up Node.js
+      - name: Configure AWS Credentials via OIDC Trust Boundary
+        # Authenticates securely with AWS using short-lived tokens instead of permanent secrets
+        uses: aws-actions/configure-aws-credentials@e3dd4a4cd9e7007c7268b88a1c97a796e62024c8 # v4.0.2
+        with:
+          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/github-actions-release-role
+          aws-region: us-east-1
+          audience: ://amazonaws.com
+
+      - name: Set up Secure Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'yarn'
 
-      - name: Install Monorepo Dependencies
+      - name: Install Monorepo Dependencies (Locked)
         run: yarn install --immutable
 
-      # Adjust this command if you want to build all actions or a specific one.
-      # Assuming Turbo filters allow targeting your action actions:
-      - name: Build Actions Distributables
+      - name: Compile Distribution Assets
         run: yarn turbo run build
 
-      - name: Force-Commit Dist and Update Release Tag
+      - name: Package Distributable for Audit Trail
         run: |
-          # 1. Configure git bot profile
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@://github.com"
-          
-          # 2. Force remove 'dist' tracking barriers locally 
-          # This temporarily overrides your .gitignore rules for this run
-          git add -f actions/*/dist/
-          
-          # 3. Commit the built assets if changes exist
-          if git diff --staged --quiet; then
-            echo "No build differences detected."
-          else
-            git commit -m "build: bundle distribution assets for release"
-          fi
-          
-          # 4. Delete the existing lightweight release tag locally and remotely, 
-          # then overwrite it with our new commit that includes the 'dist' folder.
-          # ${{ github.event.release.tag_name }} resolves to things like 'v1.0.0'
-          git tag -d ${{ github.event.release.tag_name }}
-          git push --delete origin ${{ github.event.release.tag_name }}
-          
-          git tag ${{ github.event.release.tag_name }}
-          git push origin ${{ github.event.release.tag_name }}
+          mkdir -p release-payload
+          cp -r action.yml README.md dist release-payload/
+          cd release-payload && zip -r ../action-distributable.zip .
+
+      - name: Generate Software Bill of Materials (SBOM) & Scan Vulnerabilities
+        # Scans your bundled action code and dependencies for regulatory CVE compliance
+        uses: anchore/scan-action@7c05671ae9be1cef000d2592802793b8308d74db # v6.1.0
+        with:
+          path: "release-payload"
+          output-format: sarif
+          fail-build: true # Fails the production release automatically if high/critical CVEs exist
+          severity-cutoff: high
+
+      - name: Generate Cryptographic Build Provenance
+        # Generates a signed, tamper-proof attestation mapping the zip to this exact commit
+        uses: actions/attest-build-provenance@c074443f9c5fb40f4dc15f40375a0fcf691da177 # v2.2.3
+        with:
+          subject-path: 'action-distributable.zip'
 ```
 
-### Moving Major Versions (e.g., Keeping `@v1` updated)
+### Part 3: README Documentation Update
 
-Action consumers typically don't want to lock onto a hard semantic version like `@v1.0.4`. They prefer pointing to `@v1` so they get non-breaking updates automatically.
+Add this clean, technical block under your **Enterprise Security & Compliance** section in the `README.md` to communicate your new vulnerability standards to upstream enterprise consumers:
 
-To accommodate this, you can append a final step to the workflow above using **`JasonEtco/build-and-tag-action`**. This step extracts the major version (like `v1`) from the release tag (like `v1.2.3`) and automatically force-points the moving `v1` tag to your latest production-ready commit.
+```markdown
+### 🔍 Vulnerability Governance (SBOM & CVE Scanning)
 
-```yaml
-      - name: Update Major Version Moving Tag (e.g. v1)
-        uses: JasonEtco/build-and-tag-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+To comply with **FINRA and HIPAA security mandates**, every official production package undergoes automated static application security testing (SAST) and software dependency analysis prior to release.
+
+*   **Vulnerability Gating:** The compilation pipeline automatically breaks and halts release deployment if any unmitigated **High or Critical CVE vulnerabilities** are discovered within our dependencies.
+*   **Dependency Provenance:** An automated **Software Bill of Materials (SBOM)** profile is verified and generated during the secure runner runtime to guarantee complete software transparency.
 ```
 
-### The Key Tradeoff to Consider
-
-- **The Benefit:** Zero compiled build noise in your development history. PR diffs remain perfectly readable.
-- **The Catch:** If someone attempts to reference your action pointing directly to `main` (e.g., `uses: ai-crew-suite/pipelines/actions/lint-architecture@main`), the step will **fail** because `dist/` does not exist on `main`. Users *must* use a release tag.

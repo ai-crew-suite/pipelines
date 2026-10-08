@@ -28,7 +28,7 @@ runs:
       uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         node-version: ${{ inputs.node-version }}
-        registry-url: https://registry.npmjs.org
+        registry-url: https://npmjs.org
         cache: 'yarn'
 
     - name: 📦 Install Workspace Dependencies (Yarn 4 Immutable)
@@ -49,19 +49,20 @@ runs:
         SLACK_WEBHOOK: ${{ inputs.slack-webhook-url }}
         SLACK_COLOR: "#FF0000"
         SLACK_USERNAME: "Crew Suite Deploy Bot"
-        SLACK_TITLE: "❌ Master Build Failed"
-        SLACK_MESSAGE: "The main production compilation has failed for ${{ github.repository }}. Review logs at: https://github.com{{ github.repository }}/actions/runs/${{ github.run_id }}"
+        SLACK_TITLE: "❌ Pre-Flight Production Build Failed"
+        SLACK_MESSAGE: "The main compilation check has failed for ${{ github.repository }}. Review logs at: https://github.com{{ github.repository }}/actions/runs/${{ github.run_id }}"
 
     - name: 🔐 Configure NPM Scope Registries & Provenance Flags
       shell: bash
       run: |
         git config --global user.email "bot@ai-crew-suite.com"
         git config --global user.name "ai-crew-suite-bot"
-        yarn config set npmScopes.ai-crew-suite.npmRegistryServer "https://registry.npmjs.org"
-        yarn config set npmScopes.ai-crew-suite.npmPublishRegistry "https://registry.npmjs.org"
+        yarn config set npmScopes.ai-crew-suite.npmRegistryServer "https://npmjs.org"
+        yarn config set npmScopes.ai-crew-suite.npmPublishRegistry "https://npmjs.org"
         yarn config set npmScopes.ai-crew-suite.npmAlwaysAuth true
         yarn config set npmAuthToken "${{ inputs.npm-auth-token }}"
-        echo "YARN_NPM_PUBLISH_PROVENANCE=true" >> $GITHUB_ENV
+        # Enforces Yarn Berry to pass the cryptographically signed OIDC attestation token to npm registry
+        yarn config set npmPublishProvenance true
 
     - name: 🚀 Publish Packages & Create GitHub Release
       id: changesets
@@ -69,8 +70,6 @@ runs:
       with:
         publish-script: ${{ inputs.publish-script }}
         github-token: ${{ inputs.github-token }}
-      env:
-        NODE_AUTH_TOKEN: ${{ inputs.npm-auth-token }}
 
     - name: 📢 Slack Success Notification
       if: steps.changesets.outputs.published == 'true' && inputs.slack-webhook-url != ''

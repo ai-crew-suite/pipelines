@@ -1,17 +1,30 @@
-name: 'Dependency Review Check'
-description: 'Centralized security evaluation engine to intercept critical supply-chain vulnerabilities in PRs'
-
-inputs:
-  fail-on-severity:
-    description: 'The minimum vulnerability severity threshold that will cause the build step to fail'
-    required: false
-    default: 'critical'
+name: 'Enterprise Open-Source License Firewall'
+description: 'Centralized legal compliance and supply-chain health gate to intercept unvetted open-source code changes in PRs'
 
 runs:
   using: 'composite'
   steps:
-    - name: 🔒 Execute Dependency Review Core Engine
+    - name: Audit Open-Source Licenses & OpenSSF Supply Chain Health
       uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
       with:
-        fail-on-severity: ${{ inputs.fail-on-severity }}
+        # 🔒 Hard block: Disable vulnerability scanning to eliminate duplication with Grype
+        vulnerability-check: false
+
+        # 🛡️ Allow-list: ONLY permit standard, permissive enterprise-safe licenses.
+        # This automatically blocks GPL, AGPL, Proprietary, and missing licenses.
+        allow-licenses: |
+          Apache-2.0
+          MIT
+          ISC
+          BSD-2-Clause
+          BSD-3-Clause
+          Unlicense
+          CC0-1.0
+          Public Domain
+
+        # 📊 OpenSSF Supply Chain Intelligence
+        # Injects detailed maintenance and security posture rankings for new additions
+        show-openssf-scorecard: true
+
+        # Injects the legal whitelist + scorecard matrix directly into the PR thread for triage
         comment-summary-in-pr: 'always'

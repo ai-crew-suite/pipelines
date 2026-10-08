@@ -34,7 +34,13 @@
   },
   "yaml.validate": true,
   "cSpell.words": [
+    "anchore",
+    "Distributables",
+    "exfiltration",
     "FINRA",
-    "sarif"
+    "sarif",
+    "SLSA",
+    "untampered",
+    "unvetted"
   ]
 }

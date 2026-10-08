@@ -41,17 +41,14 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           expected_sha: ${{ github.sha }}
           dev-server-port: "3000"
-          pre_release_bypass: "true"
 ```
 
 ## Parameter Integration Matrix
 
 Ensure your configuration mappings satisfy the required inputs:
 
-* [ ] **`github_token`**: The administrative access token needed to query repository workflow history parameters.
-* [ ] **`expected_sha`**: The target Git commit hash being audited for verification compliance.
 * [ ] **`dev-server-port`**: Target framework developer host port mapping value (Default: "3000").
-* [ ] **`pre_release_bypass`**: Set to "true" to log warnings rather than failing the build step if tests are incomplete during early dev stages.
+* [ ] **`public-sentry-dsn`**: Telemetry monitoring connection target stream identifier
 * [ ] **Artifact Extraction**: If an end-to-end execution fail block triggers, reports are securely captured and retained for 30 days within a playwright-report archive card.
 
 ## Architectural Dependency Tree

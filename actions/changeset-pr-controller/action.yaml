@@ -1,5 +1,5 @@
 name: 'Shared Changeset PR Controller'
-description: 'Centralized engine to manage workspace installations and execute Changesets pull requests'
+description: 'Centralized engine to manage workspace installations and execute Changesets pull requests via tracked system identities'
 
 inputs:
   node-version:
@@ -7,7 +7,7 @@ inputs:
     required: false
     default: '22'
   github-token:
-    description: 'The GitHub access token required to generate and track pull requests'
+    description: 'A dedicated GitHub App installation token or custom tracking token to allow downstream CI workflow triggers'
     required: true
   pr-title:
     description: 'The display title applied to the automatically generated Changeset PR'
@@ -17,24 +17,27 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 📂 Checkout Caller Repository
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Checkout Caller Repository with Full Auditable History
+      uses: actions/checkout@eef6142da74ffb929bfe9d0f6c17e3716e90a6cd # v4.2.1
+      with:
+        # Depth 0 guarantees complete git ledger parity for precise changelog logging
+        fetch-depth: 0
+        persist-credentials: false
 
-    - name: 🟢 Initialize Node.js Environment
+    - name: Initialize Node.js Environment
       uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         node-version: ${{ inputs.node-version }}
-        cache: 'yarn' # Natively tracks lockfile hashes across executions
+        cache: 'yarn'
 
-    # We skip executing local postinstall scripts using standard flags
-    # to guarantee third-party setups don't disrupt early build passes.
-    - name: 📦 Install Workspace Dependencies (Yarn 4 Immutable)
+    - name: Install Workspace Dependencies (Yarn 4 Immutable)
       shell: bash
       run: yarn install --immutable --inline-builds
 
-    - name: 🚀 Execute Changeset Workflow Lifecycle
+    - name: Execute Changeset Workflow Lifecycle (Yarn 4 Compliant)
       uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
       with:
-        version-script: yarn version
+        # 🛠️ Fixed: Uses the valid Yarn 4 modern execution command to calculate package drifts
+        version-script: yarn changeset version
         pr-title: ${{ inputs.pr-title }}
         github-token: ${{ inputs.github-token }}

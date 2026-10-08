@@ -1,56 +1,29 @@
-name: 'Automated Changeset Synchronization'
-description: 'Validates workspace states, auto-generates changesets for automated pipelines, and commits changes.'
-
-inputs:
-  github_token:
-    description: 'Elevated PAT or App installation token to push commits back to protected branches'
-    required: true
-  commit_message:
-    description: 'The commit string used when syncing structural changesets'
-    required: false
-    default: 'chore: automated changeset sync [skip ci]'
+name: 'Mandatory Changeset Verification Engine'
+description: 'Validates workspace tracking states to enforce strict audit documentation rules on PR scopes'
 
 runs:
   using: 'composite'
   steps:
-    - name: 🔍 Audit Changeset Presence
-      id: changeset-audit
+    - name: Audit Changeset Documentation Presence
       shell: bash
       run: |
-        if npx changeset status > /dev/null 2>&1; then
-          echo "has_changeset=true" >> $GITHUB_OUTPUT
-          echo "✅ Active changeset documented by contributor."
+        echo "================================================================"
+        echo "🔍 Commencing Regulatory Change Control Verification..."
+        echo "================================================================"
+
+        # Pull changeset status cleanly
+        if npx changeset status --since=origin/main > /dev/null 2>&1; then
+          echo "✅ Compliance Check Passed: Human-vetted changeset file documented."
         else
-          echo "has_changeset=false" >> $GITHUB_OUTPUT
-          echo "⚠️ No changeset located. Initializing automated fallback."
-        fi
-
-    - name: 🦋 Generate Fallback Changeset
-      if: steps.changeset-audit.outputs.has_changeset == 'false'
-      shell: bash
-      run: |
-        # Generates an empty changeset to allow pipelines to continue without throwing errors
-        npx changeset --empty
-        echo "✨ Fallback configuration applied."
-
-    - name: 📤 Push Generated Files back to Branch
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: |
-        # Only proceed if changes exist on disk
-        if [ -n "$(git status --porcelain .changeset)" ]; then
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add .changeset/*
-          git commit -m "${{ inputs.commit_message }}"
-
-          # Extracts current branch name securely whether running on PR or direct push
-          BRANCH_REF="${{ github.head_ref || github.ref_name }}"
-
-          echo "Pushing updates directly back into branch tracking line: $BRANCH_REF"
-          git push origin HEAD:$BRANCH_REF
-        else
-          echo "No internal formatting or state drifts caught. Workspace is fully synchronized."
+          echo "❌ COMPLIANCE VIOLATION DETECTED"
+          echo "--------------------------------------------------------"
+          echo "Error: This pull request is missing a mandatory changeset file."
+          echo "To satisfy FINRA, SOC-2, and HIPAA change control metrics, all"
+          echo "code alterations must be explicitly documented."
+          echo ""
+          echo "Action Required:"
+          echo "Please run 'yarn changeset' locally on your workstation to describe"
+          echo "your modifications, and commit the generated file to this branch."
+          echo "--------------------------------------------------------"
+          exit 1 # Hard fail: Immediately locks the PR from merging
         fi

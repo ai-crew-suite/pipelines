@@ -1,0 +1,84 @@
+name: 'Unified Repository Security Engine'
+description: 'Centralized analysis engine combining CodeQL SAST, Anchore Grype SCA, and Aqua Trivy IaC configuration scanning'
+
+inputs:
+  language:
+    description: 'The target language runtime profile to pass to CodeQL'
+    required: false
+    default: 'javascript'
+  scan-infrastructure:
+    description: 'Toggle to enable or disable Trivy Infrastructure/IaC configuration scanning'
+    required: false
+    default: 'true'
+
+# CodeQL must be run with checkout done in the client code
+runs:
+  using: 'composite'
+  steps:
+    # =========================================================
+    # PHASE 1: Infrastructure-as-Code & Config Compliance (IaC)
+    # =========================================================
+    - name: 🛡️ Run Trivy Configuration Vulnerability Scanner
+      if: inputs.scan-infrastructure == 'true'
+      uses: aquasecurity/trivy-action@18f259c2528aedfa7250154811ccd99a9d774c55 # v0.28.0 (Pinned SHA)
+      with:
+        scan-type: 'config'
+        hide-progress: true
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        # 🔒 Hardened: Fails the pipeline if High or Critical IaC defects are detected
+        exit-code: '1'
+        severity: 'HIGH,CRITICAL'
+
+    - name: 📤 Upload Trivy Results to GitHub Security Center
+      # always() ensures audit data is preserved in GitHub Advanced Security even if the scan step failed the build
+      if: inputs.scan-infrastructure == 'true' && always()
+      uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+      with:
+        sarif_file: 'trivy-results.sarif'
+        category: "/type:infrastructure"
+
+    # =========================================================
+    # PHASE 2: Third-Party Risk Management (SCA Dependency Scan)
+    # =========================================================
+    - name: 🔍 Scan Node Workspace for Regulatory CVE Compliance
+      uses: anchore/scan-action@7c05671ae9be1cef000d2592802793b8308d74db # v6.1.0
+      with:
+        path: "."
+        output-format: table
+        fail-build: true
+        severity-cutoff: high
+
+    # =========================================================
+    # PHASE 3: Secure Software Development (SAST Code Scan)
+    # =========================================================
+    - name: 📂 Initialize CodeQL Core Analysis Engines
+      uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+      with:
+        languages: ${{ inputs.language }}
+        queries: +security-and-quality
+        config: |
+          name: "Centralized CodeQL Configuration"
+          disable-default-queries: false
+          paths:
+            - "packages"
+            - "plugins"
+            - "scripts"
+            - "test"
+            - "actions"
+          paths-ignore:
+            - "**/node_modules"
+            - "**/dist"
+            - "**/dist-types"
+            - "**/.turbo"
+            - "**/.yarn"
+
+    - name: 🛠️ Autobuild Source Targets
+      if: inputs.language == 'javascript'
+      uses: github/codeql-action/autobuild@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+
+    - name: 🔎 Perform CodeQL Analysis Matrix Passes
+      if: inputs.language == 'javascript'
+      uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+      with:
+        category: "/language:${{ inputs.language }}"

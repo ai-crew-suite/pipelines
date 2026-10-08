@@ -1,5 +1,5 @@
 name: 'Validate Branch and PR Targets'
-description: 'Centralized rules enforcing branch naming conventions and PR targets across AI Crew Suite'
+description: 'Centralized rules enforcing branch naming conventions and PR targets across AI Crew Suite with input sanitization'
 
 inputs:
   head-ref:
@@ -12,18 +12,27 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 🏷️ Check branch naming convention
+    - name: Check branch naming convention
       shell: bash
       env:
-        BRANCH_NAME: ${{ inputs.head-ref }}
+        RAW_BRANCH_NAME: ${{ inputs.head-ref }}
       run: |
-        : "${BRANCH_NAME:?head-ref input is required}"
+        : "${RAW_BRANCH_NAME:?head-ref input is required}"
+
+        # Strict Sanitization: Allow only a safe character class for git branch references.
+        # This strips out wildcards, semi-colons, backticks, spaces, or quotes.
+        SANITIZED_BRANCH=$(echo "$RAW_BRANCH_NAME" | sed 's/[^a-zA-Z0-9./_-]//g')
+
+        if [ "$RAW_BRANCH_NAME" != "$SANITIZED_BRANCH" ]; then
+          echo "❌ Critical Security Error: Branch name contains illegal or unsafe characters."
+          exit 1
+        fi
 
         HUMAN_BRANCH_REGEX='^(bugfix|hotfix|feature|infrastructure|maintenance|content)/[a-z0-9-]+$'
         DEPENDABOT_BRANCH_REGEX='^dependabot/[a-z0-9._/-]+$'
 
-        if [[ ! $BRANCH_NAME =~ $HUMAN_BRANCH_REGEX && ! $BRANCH_NAME =~ $DEPENDABOT_BRANCH_REGEX ]]; then
-          echo "❌ Invalid branch name: $BRANCH_NAME"
+        if [[ ! "$SANITIZED_BRANCH" =~ $HUMAN_BRANCH_REGEX && ! "$SANITIZED_BRANCH" =~ $DEPENDABOT_BRANCH_REGEX ]]; then
+          echo "❌ Invalid branch name: $SANITIZED_BRANCH"
           echo ""
           echo "Branch names must follow one of these patterns:"
           echo "  - bugfix/<description>     (e.g., bugfix/fix-navigation-menu)"
@@ -38,17 +47,25 @@ runs:
           exit 1
         fi
 
-        echo "✅ Branch name is valid: $BRANCH_NAME"
+        echo "✅ Branch name is valid: $SANITIZED_BRANCH"
 
-    - name: 🎯 Ensure PR targets main
+    - name: Ensure PR targets main
       shell: bash
       env:
         TARGET_BRANCH: ${{ inputs.base-ref }}
       run: |
         : "${TARGET_BRANCH:?base-ref input is required}"
 
-        if [[ "$TARGET_BRANCH" != "main" ]]; then
-          echo "⚠️ Warning: PR is targeting '$TARGET_BRANCH' instead of 'main'"
+        # Clean target branch name as well to maintain uniform security baselines
+        SANITIZED_TARGET=$(echo "$TARGET_BRANCH" | sed 's/[^a-zA-Z0-9./_-]//g')
+
+        if [ "$TARGET_BRANCH" != "$SANITIZED_TARGET" ]; then
+          echo "❌ Critical Security Error: Target branch name contains illegal characters."
+          exit 1
+        fi
+
+        if [ "$SANITIZED_TARGET" != "main" ]; then
+          echo "⚠️ Warning: PR is targeting '$SANITIZED_TARGET' instead of 'main'"
           echo "This is allowed, but make sure this is intentional."
         else
           echo "✅ PR correctly targets 'main' branch"
