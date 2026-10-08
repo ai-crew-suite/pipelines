@@ -54,9 +54,9 @@ jobs:
       - name: 🔍 Sync Static Infrastructure Files
         uses: ai-crew-suite/pipelines/actions/sync-static-files@v1
         with:
-          static_files_path: "static-repo-files-sync"
+          static_files_path: 'static-repo-files-sync'
           GH_PAT: ${{ secrets.GLOBAL_INFRA_PAT }}
-          PR_LABELS: "infrastructure, automated-sync"
+          PR_LABELS: 'infrastructure, automated-sync'
 ```
 
 ## Parameter Integration Matrix
@@ -75,9 +75,7 @@ export default {
         ai-crew-suite/pipelines
         ai-crew-suite/infra
       `,
-      files: [
-        { source: 'templates/.gitignore', dest: '.gitignore' },
-      ],
+      files: [{ source: 'templates/.gitignore', dest: '.gitignore' }],
     },
   ],
 };
@@ -87,11 +85,11 @@ export default {
 
 ### Action Inputs Configuration
 
-| Name | Required | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `static_files_path` | **Yes** | *None* | Directory containing the infrastructure `src/` and its tracking `sync.ts`. |
-| `GH_PAT` | **Yes** | *None* | Privileged Token that can read and write the target repositories and pull requests. |
-| `PR_LABELS` | No | `sync` | Comma- or newline-separated pull request labels applied to generated PRs. |
+| Name                | Required | Default | Description                                                                         |
+| :------------------ | :------- | :------ | :---------------------------------------------------------------------------------- |
+| `static_files_path` | **Yes**  | _None_  | Directory containing the infrastructure `src/` and its tracking `sync.ts`.          |
+| `GH_PAT`            | **Yes**  | _None_  | Privileged Token that can read and write the target repositories and pull requests. |
+| `PR_LABELS`         | No       | `sync`  | Comma- or newline-separated pull request labels applied to generated PRs.           |
 
 ## Local Development Workflow
 

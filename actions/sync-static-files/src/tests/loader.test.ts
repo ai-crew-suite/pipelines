@@ -33,9 +33,7 @@ describe('loadConfig()', () => {
 
   it('should successfully return the default exported object configuration matrix', async () => {
     const expectedConfig = {
-      default: [
-        { name: 'Common Files', repos: 'ai-crew-suite/infra', files: [] }
-      ]
+      default: [{ name: 'Common Files', repos: 'ai-crew-suite/infra', files: [] }],
     };
     mockImport.mockResolvedValue({ default: expectedConfig });
 

@@ -22,7 +22,7 @@ import type { RepositoryPlan } from '../types';
 
 // Mock node core modules
 vi.mock('node:child_process', () => ({
-  execFile: vi.fn()
+  execFile: vi.fn(),
 }));
 
 vi.mock('node:fs/promises', () => ({
@@ -43,8 +43,12 @@ describe('Repository Sync Engine', () => {
     },
     pulls: {
       list: vi.fn().mockResolvedValue({ data: [] }),
-      create: vi.fn().mockResolvedValue({ data: { number: 42, html_url: 'http://pr-42', body: '' } }),
-      update: vi.fn().mockResolvedValue({ data: { number: 42, html_url: 'http://pr-42', body: '' } }),
+      create: vi
+        .fn()
+        .mockResolvedValue({ data: { number: 42, html_url: 'http://pr-42', body: '' } }),
+      update: vi
+        .fn()
+        .mockResolvedValue({ data: { number: 42, html_url: 'http://pr-42', body: '' } }),
     },
     issues: {
       addLabels: vi.fn().mockResolvedValue({}),
@@ -74,19 +78,34 @@ describe('Repository Sync Engine', () => {
     it('should properly generate structural directories and copy dependencies', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
 
-      await copyFile({ source: 'src/file.ts', sourcePath: 'src/file.ts', dest: '.github/file.ts' }, '/tmp/repo');
+      await copyFile(
+        { source: 'src/file.ts', sourcePath: 'src/file.ts', dest: '.github/file.ts' },
+        '/tmp/repo'
+      );
 
       expect(fsPromises.mkdir).toHaveBeenCalledWith('/tmp/repo/.github', { recursive: true });
-      expect(fsPromises.cp).toHaveBeenCalledWith('src/file.ts', '/tmp/repo/.github/file.ts', { recursive: true, force: true });
+      expect(fsPromises.cp).toHaveBeenCalledWith('src/file.ts', '/tmp/repo/.github/file.ts', {
+        recursive: true,
+        force: true,
+      });
     });
 
     it('should accurately calculate deeply nested destination parent folders for mkdir', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
 
-      await copyFile({ source: 'src/file.ts', sourcePath: 'src/file.ts', dest: 'deeply/nested/folder/app.ts' }, '/tmp/repo');
+      await copyFile(
+        { source: 'src/file.ts', sourcePath: 'src/file.ts', dest: 'deeply/nested/folder/app.ts' },
+        '/tmp/repo'
+      );
 
-      expect(fsPromises.mkdir).toHaveBeenCalledWith('/tmp/repo/deeply/nested/folder', { recursive: true });
-      expect(fsPromises.cp).toHaveBeenCalledWith('src/file.ts', '/tmp/repo/deeply/nested/folder/app.ts', { recursive: true, force: true });
+      expect(fsPromises.mkdir).toHaveBeenCalledWith('/tmp/repo/deeply/nested/folder', {
+        recursive: true,
+      });
+      expect(fsPromises.cp).toHaveBeenCalledWith(
+        'src/file.ts',
+        '/tmp/repo/deeply/nested/folder/app.ts',
+        { recursive: true, force: true }
+      );
     });
   });
 
@@ -94,7 +113,7 @@ describe('Repository Sync Engine', () => {
     const defaultPlan: RepositoryPlan = {
       owner: 'ai-crew-suite',
       name: 'core',
-      files: [{ source: 'src/a.txt', sourcePath: 'src/a.txt', dest: 'a.txt' }]
+      files: [{ source: 'src/a.txt', sourcePath: 'src/a.txt', dest: 'a.txt' }],
     };
 
     it('should short-circuit and cleanly exit early if no modified changes are detected', async () => {
@@ -109,7 +128,9 @@ describe('Repository Sync Engine', () => {
         return {} as any;
       });
 
-      const result = await syncRepository(client, defaultPlan, 'ai-crew-suite/infra', 'token', ['sync']);
+      const result = await syncRepository(client, defaultPlan, 'ai-crew-suite/infra', 'token', [
+        'sync',
+      ]);
 
       expect(result).toBeUndefined();
       expect(fsPromises.rm).toHaveBeenCalledWith('/tmp/mock-dir', { recursive: true, force: true });
@@ -127,7 +148,9 @@ describe('Repository Sync Engine', () => {
         return {} as any;
       });
 
-      const result = await syncRepository(client, defaultPlan, 'ai-crew-suite/infra', 'token', ['sync-label']);
+      const result = await syncRepository(client, defaultPlan, 'ai-crew-suite/infra', 'token', [
+        'sync-label',
+      ]);
 
       expect(result).toEqual({ number: 42, html_url: 'http://pr-42', body: '' });
       expect(client.pulls.create).toHaveBeenCalledWith({
@@ -136,13 +159,13 @@ describe('Repository Sync Engine', () => {
         title: 'maintenance: sync static files',
         head: 'maintenance/infra',
         base: 'main',
-        body: 'Synchronize static files from [ai-crew-suite/infra](https://github.com/ai-crew-suite/infra).'
+        body: 'Synchronize static files from [ai-crew-suite/infra](https://github.com/ai-crew-suite/infra).',
       });
       expect(client.issues.addLabels).toHaveBeenCalledWith({
         owner: 'ai-crew-suite',
         repo: 'core',
         issue_number: 42,
-        labels: ['sync-label']
+        labels: ['sync-label'],
       });
     });
 
@@ -151,7 +174,7 @@ describe('Repository Sync Engine', () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
 
       client.pulls.list.mockResolvedValue({
-        data: [{ number: 99, html_url: 'http://pr-99', body: 'old-body' }]
+        data: [{ number: 99, html_url: 'http://pr-99', body: 'old-body' }],
       });
 
       vi.mocked(execFile).mockImplementation((cmd, args, opts, callback) => {
@@ -169,7 +192,7 @@ describe('Repository Sync Engine', () => {
         repo: 'core',
         pull_number: 99,
         title: 'maintenance: sync static files',
-        body: 'Synchronize static files from [ai-crew-suite/infra](https://github.com/ai-crew-suite/infra).'
+        body: 'Synchronize static files from [ai-crew-suite/infra](https://github.com/ai-crew-suite/infra).',
       });
       expect(client.pulls.create).not.toHaveBeenCalled();
     });
@@ -212,7 +235,7 @@ describe('Repository Sync Engine', () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
 
       client.pulls.list.mockResolvedValue({
-        data: [{ number: 99, html_url: 'http://pr-99', body: 'old-body' }]
+        data: [{ number: 99, html_url: 'http://pr-99', body: 'old-body' }],
       });
 
       vi.mocked(execFile).mockImplementation((cmd, args, opts, callback) => {
@@ -247,7 +270,6 @@ describe('Repository Sync Engine', () => {
       expect(client.pulls.create).toHaveBeenCalled();
       expect(client.issues.addLabels).not.toHaveBeenCalled();
     });
-
   });
 
   describe('runGit()', () => {

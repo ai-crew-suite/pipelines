@@ -17,7 +17,7 @@ import { isAbsolute, normalize, relative, resolve, sep } from 'node:path';
 import type { FilePlan, RepositoryPlan, SyncConfig, SyncGroup } from './types.js';
 
 function groupsFromConfig(config: SyncConfig): SyncGroup[] {
-  return Object.values(config).flatMap(group => (Array.isArray(group) ? group : [group]));
+  return Object.values(config).flatMap((group) => (Array.isArray(group) ? group : [group]));
 }
 
 function repositoryName(value: string): { owner: string; name: string } {
@@ -52,7 +52,7 @@ export function buildPlans(config: SyncConfig, sourceRoot: string): RepositoryPl
 
     const repositories = typeof group.repos === 'string' ? group.repos.split(/\r?\n/) : group.repos;
 
-    for (const repository of repositories.map(value => value.trim()).filter(Boolean)) {
+    for (const repository of repositories.map((value) => value.trim()).filter(Boolean)) {
       const target = repositoryName(repository);
       const key = `${target.owner}/${target.name}`;
       const plan = plans.get(key) ?? { ...target, files: [] };
@@ -64,7 +64,11 @@ export function buildPlans(config: SyncConfig, sourceRoot: string): RepositoryPl
 
         const normalizedDestination = normalize(file.dest);
 
-        if (isAbsolute(file.dest) || normalizedDestination === '..' || normalizedDestination.startsWith(`..${sep}`)) {
+        if (
+          isAbsolute(file.dest) ||
+          normalizedDestination === '..' ||
+          normalizedDestination.startsWith(`..${sep}`)
+        ) {
           throw new Error(`Destination path must stay inside the target repository: ${file.dest}`);
         }
 
@@ -73,7 +77,7 @@ export function buildPlans(config: SyncConfig, sourceRoot: string): RepositoryPl
           sourcePath: resolveInside(sourceRoot, file.source, 'Source path'),
         };
 
-        const duplicate = plan.files.find(existing => existing.dest === file.dest);
+        const duplicate = plan.files.find((existing) => existing.dest === file.dest);
 
         if (duplicate) {
           if (duplicate.source !== file.source) {
@@ -94,5 +98,12 @@ export function buildPlans(config: SyncConfig, sourceRoot: string): RepositoryPl
 }
 
 export function parseLabels(value: string): string[] {
-  return [...new Set(value.split(/[\n,]/).map(label => label.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      value
+        .split(/[\n,]/)
+        .map((label) => label.trim())
+        .filter(Boolean)
+    ),
+  ];
 }

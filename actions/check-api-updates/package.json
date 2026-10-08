@@ -25,9 +25,8 @@
     "lint": "lint:actions",
     "lint:actions": "FORCE_COLOR=1 npx node-actionlint",
     "lint:script": "crew lint",
-    "test": "yarn test:unit && yarn test:integration",
-    "test:unit": "vitest run --config vitest.config.ts",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test": "yarn test:unit",
+    "test:unit": "crew test:unit",
     "typecheck": "crew typecheck"
   },
   "devDependencies": {

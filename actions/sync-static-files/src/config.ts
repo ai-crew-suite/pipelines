@@ -31,5 +31,9 @@ export function readConfig(): ActionConfig {
   return {
     sourcePath,
     token,
-    labels: labels.split(/[\n,]/).map(label => label.trim()).filter(Boolean) };
+    labels: labels
+      .split(/[\n,]/)
+      .map((label) => label.trim())
+      .filter(Boolean),
+  };
 }

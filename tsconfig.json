@@ -2,9 +2,6 @@
   "extends": "@ai-crew-suite/typescript-shared-config/node",
   "files": [],
   "references": [
-    { "path": "./actions/analyze-codeql" },
-    { "path": "./actions/analyze-trivy" },
-    { "path": "./actions/bypass-dependency-review" },
     { "path": "./actions/bypass-playwright-tests" },
     { "path": "./actions/changeset-pr-controller" },
     { "path": "./actions/changeset-sync" },
@@ -17,6 +14,7 @@
     { "path": "./actions/run-ci" },
     { "path": "./actions/run-dependency-review" },
     { "path": "./actions/run-playwright-tests" },
+    { "path": "./actions/security-analysis" },
     { "path": "./actions/sync-eslint-config" },
     { "path": "./actions/sync-static-files" }
   ]

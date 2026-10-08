@@ -2,10 +2,6 @@
 
 - `check-api-updates` need implementation
 
-- Fix scripts in all actions package.json files
-
-- `yarn typecheck` ends up in a forever loop
-
 ## Open Source Repository Governance Policy
 
 Because you are using a standard organization account without global enterprise-level policy controls, you must enforce the following rules directly inside your repository settings.

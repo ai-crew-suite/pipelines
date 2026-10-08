@@ -29,8 +29,18 @@ export async function run(): Promise<void> {
     const sourceRepository = `${github.context.repo.owner}/${github.context.repo.repo}`;
 
     for (const plan of plans) {
-      const pullRequest = await syncRepository(client, plan, sourceRepository, config.token, config.labels);
-      info(pullRequest ? `Updated ${plan.owner}/${plan.name}: ${pullRequest.html_url}` : `No changes for ${plan.owner}/${plan.name}`);
+      const pullRequest = await syncRepository(
+        client,
+        plan,
+        sourceRepository,
+        config.token,
+        config.labels
+      );
+      info(
+        pullRequest
+          ? `Updated ${plan.owner}/${plan.name}: ${pullRequest.html_url}`
+          : `No changes for ${plan.owner}/${plan.name}`
+      );
     }
   } catch (error) {
     setFailed(error instanceof Error ? error.message : String(error));

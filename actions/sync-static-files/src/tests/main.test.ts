@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2026 The AI Crew Suite Authors
  *
@@ -30,14 +29,14 @@ vi.mock('@actions/core', () => ({
 
 vi.mock('@actions/github', () => ({
   getOctokit: vi.fn(() => ({
-    rest: { mockClient: true }
+    rest: { mockClient: true },
   })),
   context: {
     repo: {
       owner: 'ai-crew-suite',
-      repo: 'infra-central'
-    }
-  }
+      repo: 'infra-central',
+    },
+  },
 }));
 
 vi.mock('../src/config.js', () => ({ readConfig: vi.fn() }));
