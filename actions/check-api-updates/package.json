@@ -20,7 +20,7 @@
     "directory": "packages/yarn-plugin-custom-add"
   },
   "scripts": {
-    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin esbuild",
+    "build": "ncc build src/main.ts -o dist --source-map --license third-party-licenses.txt",
     "clean": "crew clean",
     "lint": "lint:actions",
     "lint:actions": "FORCE_COLOR=1 npx node-actionlint",
@@ -33,7 +33,12 @@
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "catalog:dev",
     "@ai-crew-suite/typescript-shared-config": "catalog:dev",
+    "@types/node": "catalog:dev",
+    "@vercel/ncc": "catalog:dev",
+    "eslint": "catalog:dev",
     "node-actionlint": "catalog:dev",
-    "openapi-typescript": "catalog:dev"
+    "prettier": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
   }
 }

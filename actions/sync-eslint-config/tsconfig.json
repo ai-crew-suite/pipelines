@@ -5,6 +5,7 @@
     "moduleResolution": "bundler"
   },
   "include": [
-    "src/**/*"
-  ]
+    "src*"
+  ],
+  "references": []
 }

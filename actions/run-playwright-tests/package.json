@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "crew build",
+    "build": "ncc build src/main.ts -o dist --source-map --license third-party-licenses.txt",
     "clean": "crew clean",
     "format": "crew format",
     "lint": "yarn lint:actions && yarn lint:typescript",
@@ -22,6 +22,7 @@
     "@actions/github": "catalog:prod"
   },
   "devDependencies": {
+    "@ai-crew-suite/crew-cli": "catalog:dev",
     "@ai-crew-suite/typescript-shared-config": "catalog:dev",
     "@types/node": "catalog:dev",
     "@vercel/ncc": "catalog:dev",
