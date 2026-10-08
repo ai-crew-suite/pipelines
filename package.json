@@ -13,21 +13,21 @@
     "actions/*"
   ],
   "scripts": {
-    "build": "turbo build",
-    "clean": "turbo clean",
-    "format": "prettier --write \"**/*.{json,md,css,ts,js}\"",
+    "build": "yarn turbo run build",
+    "clean": "yarn turbo run clean",
+    "format": "yarn turbo run format",
     "install:setup": "husky",
     "lint": "yarn lint:actions && yarn lint:typescript",
-    "lint:actions": "yarn turbo lint:actions",
-    "lint:typescript": "yarn turbo lint:typescript",
+    "lint:actions": "yarn turbo run lint:actions",
+    "lint:typescript": "yarn turbo run lint:typescript",
     "sync": "crew sync:refs",
-    "test": "yarn turbo test:unit",
+    "test": "yarn test:unit && yarn test:integration",
     "test:integration": "yarn turbo run test:integration",
-    "test:unit": "turbo test:unit",
+    "test:unit": "yarn turbo run test:unit",
     "test:unit:coverage": "yarn turbo run test:unit:coverage",
-    "typecheck": "yarn turbo typecheck",
-    "typecheck:full": "yarn turbo typecheck --force",
-    "version": "changeset version && yarn install"
+    "typecheck": "yarn turbo run typecheck",
+    "typecheck:full": "yarn turbo run typecheck --force",
+    "version": "changeset version"
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "catalog:dev",

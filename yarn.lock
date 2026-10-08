@@ -73,33 +73,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ai-crew-suite/action-analyze-codeql@workspace:actions/analyze-codeql":
-  version: 0.0.0-use.local
-  resolution: "@ai-crew-suite/action-analyze-codeql@workspace:actions/analyze-codeql"
-  dependencies:
-    "@ai-crew-suite/typescript-shared-config": "catalog:dev"
-    node-actionlint: "catalog:dev"
-  languageName: unknown
-  linkType: soft
-
-"@ai-crew-suite/action-analyze-trivy@workspace:actions/analyze-trivy":
-  version: 0.0.0-use.local
-  resolution: "@ai-crew-suite/action-analyze-trivy@workspace:actions/analyze-trivy"
-  dependencies:
-    "@ai-crew-suite/typescript-shared-config": "catalog:dev"
-    node-actionlint: "catalog:dev"
-  languageName: unknown
-  linkType: soft
-
-"@ai-crew-suite/action-bypass-dependency-review@workspace:actions/bypass-dependency-review":
-  version: 0.0.0-use.local
-  resolution: "@ai-crew-suite/action-bypass-dependency-review@workspace:actions/bypass-dependency-review"
-  dependencies:
-    "@ai-crew-suite/typescript-shared-config": "catalog:dev"
-    node-actionlint: "catalog:dev"
-  languageName: unknown
-  linkType: soft
-
 "@ai-crew-suite/action-bypass-playwright-tests@workspace:actions/bypass-playwright-tests":
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/action-bypass-playwright-tests@workspace:actions/bypass-playwright-tests"
@@ -221,6 +194,15 @@ __metadata:
     prettier: "catalog:dev"
     typescript: "catalog:dev"
     vitest: "catalog:dev"
+  languageName: unknown
+  linkType: soft
+
+"@ai-crew-suite/action-security-analysis@workspace:actions/security-analysis":
+  version: 0.0.0-use.local
+  resolution: "@ai-crew-suite/action-security-analysis@workspace:actions/security-analysis"
+  dependencies:
+    "@ai-crew-suite/typescript-shared-config": "catalog:dev"
+    node-actionlint: "catalog:dev"
   languageName: unknown
   linkType: soft
 
