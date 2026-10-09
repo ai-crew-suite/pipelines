@@ -39,10 +39,10 @@ vi.mock('@actions/github', () => ({
   },
 }));
 
-vi.mock('../src/config.js', () => ({ readConfig: vi.fn() }));
-vi.mock('../src/loader.js', () => ({ loadConfig: vi.fn() }));
-vi.mock('../src/planner.js', () => ({ buildPlans: vi.fn() }));
-vi.mock('../src/git.js', () => ({ syncRepository: vi.fn() }));
+vi.mock('../config.js', () => ({ readConfig: vi.fn() }));
+vi.mock('../loader.js', () => ({ loadConfig: vi.fn() }));
+vi.mock('../planner.js', () => ({ buildPlans: vi.fn() }));
+vi.mock('../git.js', () => ({ syncRepository: vi.fn() }));
 
 describe('Main Action Orchestrator Workflow', () => {
   beforeEach(() => {

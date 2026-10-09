@@ -251,9 +251,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ai-crew-suite/crew-cli@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@ai-crew-suite/crew-cli@npm:0.0.4"
+"@ai-crew-suite/crew-cli@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@ai-crew-suite/crew-cli@npm:0.0.5"
   dependencies:
     "@backstage/cli": "npm:^0.36.4"
     "@backstage/core-components": "npm:^0.18.14"
@@ -298,7 +298,7 @@ __metadata:
     vitest: "npm:^5.0.3"
   bin:
     crew: ./dist/bin/crew.js
-  checksum: 10c0/dfd09b624e40da0af1838e6886aef6abbdb9a322a4d2210401a713e50ea635a5a71f78a1a4d25015e46420f0c4b6ace62be58a02bea2db483aa6327febc120fc
+  checksum: 10c0/e074130ae3bd58fc2732838c0a8f67c9ad89b23f70eb717c5fc43b313e630ad7341e539dfcbb52c7be1e7063187553dfead96530b697de5c4f85debc26a8fc11
   languageName: node
   linkType: hard
 
@@ -313,6 +313,7 @@ __metadata:
     "@types/node": "catalog:dev"
     "@typescript-eslint/eslint-plugin": "catalog:dev"
     "@typescript-eslint/parser": "catalog:dev"
+    "@vercel/ncc": "catalog:dev"
     eslint: "catalog:dev"
     husky: "catalog:dev"
     jiti: "catalog:dev"
@@ -325,10 +326,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ai-crew-suite/typescript-shared-config@npm:^0.0.2":
-  version: 0.0.2
-  resolution: "@ai-crew-suite/typescript-shared-config@npm:0.0.2"
-  checksum: 10c0/599b3c625be4bb9dc1f420449aa7bfc4729b5ecf9102cf1bcf587ccf31a867a8ca74a263efd61185528352d2c1c3edae2868ffe4c0d7eac151cf6a6e47a5d482
+"@ai-crew-suite/typescript-shared-config@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "@ai-crew-suite/typescript-shared-config@npm:0.0.3"
+  checksum: 10c0/e800dd8cceb17fd4c8bad418d47178bae0f5fc659ed16edb1b0d7803c89228b9ab7345556163d528f92ccb789cdcc8eac8a2c7c5ae1be859bfa815a020c1cd1f
   languageName: node
   linkType: hard
 

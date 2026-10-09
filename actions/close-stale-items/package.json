@@ -1,9 +1,24 @@
 {
   "name": "@ai-crew-suite/action-close-stale-items",
   "description": "Centralized composite GitHub Action to automatically flag, track, and close stale issues and pull requests across the AI Crew Suite.",
-  "private": true,
   "license": "Apache-2.0",
+  "version": "0.0.1",
   "type": "module",
+  "keywords": [],
+  "engines": {
+    "node": "22 || 24"
+  },
+  "packageManager": "yarn@4.18.1",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/ai-crew-suite/foundry/issues",
+    "email": "support@ai-crew-suite.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-crew-suite/foundry",
+    "directory": "actions/close-stale-items"
+  },
   "scripts": {
     "lint": "yarn lint:actions",
     "lint:actions": "FORCE_COLOR=1 npx node-actionlint"

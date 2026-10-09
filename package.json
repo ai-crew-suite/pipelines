@@ -14,6 +14,8 @@
   ],
   "scripts": {
     "build": "yarn turbo run build",
+    "changeset-generate": "yarn changeset",
+    "changeset-bump-version": "yarn changeset version",
     "clean": "yarn turbo run clean",
     "format": "yarn turbo run format",
     "install:setup": "husky",
@@ -25,8 +27,7 @@
     "test:unit": "yarn turbo run test:unit",
     "test:unit:coverage": "yarn turbo run test:unit:coverage",
     "typecheck": "yarn turbo run typecheck",
-    "typecheck:full": "yarn turbo run typecheck --force",
-    "version": "changeset version"
+    "typecheck:full": "yarn turbo run typecheck --force"
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "catalog:dev",
@@ -36,6 +37,7 @@
     "@types/node": "catalog:dev",
     "@typescript-eslint/eslint-plugin": "catalog:dev",
     "@typescript-eslint/parser": "catalog:dev",
+    "@vercel/ncc": "catalog:dev",
     "eslint": "catalog:dev",
     "husky": "catalog:dev",
     "jiti": "catalog:dev",

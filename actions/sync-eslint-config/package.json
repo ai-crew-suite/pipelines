@@ -2,8 +2,23 @@
   "name": "@ai-crew-suite/action-sync-eslint-config",
   "description": "GitHub Action to sync ESLint configuration",
   "license": "Apache-2.0",
-  "private": true,
+  "version": "0.0.1",
   "type": "module",
+  "keywords": [],
+  "engines": {
+    "node": "22 || 24"
+  },
+  "packageManager": "yarn@4.18.1",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/ai-crew-suite/foundry/issues",
+    "email": "support@ai-crew-suite.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-crew-suite/foundry",
+    "directory": "actions/sync-eslint-config"
+  },
   "scripts": {
     "build": "ncc build src/main.ts -o dist --source-map --license third-party-licenses.txt",
     "clean": "crew clean",

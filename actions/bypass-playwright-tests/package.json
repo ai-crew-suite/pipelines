@@ -1,9 +1,24 @@
 {
   "name": "@ai-crew-suite/action-bypass-playwright-tests",
   "description": "Standard organization-wide logging and tracking for bypassed E2E testing checkpoints",
-  "private": true,
   "license": "Apache-2.0",
+  "version": "0.0.1",
   "type": "module",
+  "keywords": [],
+  "engines": {
+    "node": "22 || 24"
+  },
+  "packageManager": "yarn@4.18.1",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/ai-crew-suite/foundry/issues",
+    "email": "support@ai-crew-suite.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-crew-suite/foundry",
+    "directory": "actions/bypass-playwright-tests"
+  },
   "scripts": {
     "lint": "yarn lint:actions",
     "lint:actions": "FORCE_COLOR=1 npx node-actionlint"
