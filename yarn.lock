@@ -251,9 +251,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ai-crew-suite/crew-cli@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "@ai-crew-suite/crew-cli@npm:0.0.5"
+"@ai-crew-suite/crew-cli@npm:^0.0.6":
+  version: 0.0.6
+  resolution: "@ai-crew-suite/crew-cli@npm:0.0.6"
   dependencies:
     "@backstage/cli": "npm:^0.36.4"
     "@backstage/core-components": "npm:^0.18.14"
@@ -298,7 +298,7 @@ __metadata:
     vitest: "npm:^5.0.3"
   bin:
     crew: ./dist/bin/crew.js
-  checksum: 10c0/e074130ae3bd58fc2732838c0a8f67c9ad89b23f70eb717c5fc43b313e630ad7341e539dfcbb52c7be1e7063187553dfead96530b697de5c4f85debc26a8fc11
+  checksum: 10c0/6f21053f6da670135a0baee9092ed2782e6c45fd8a4589b4fab51211ebe214d5039d7c353c0a847a8c323b7ede6a35ac1897ec27d966c7c93be268a7c6021688
   languageName: node
   linkType: hard
 
@@ -326,10 +326,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ai-crew-suite/typescript-shared-config@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "@ai-crew-suite/typescript-shared-config@npm:0.0.3"
-  checksum: 10c0/e800dd8cceb17fd4c8bad418d47178bae0f5fc659ed16edb1b0d7803c89228b9ab7345556163d528f92ccb789cdcc8eac8a2c7c5ae1be859bfa815a020c1cd1f
+"@ai-crew-suite/typescript-shared-config@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "@ai-crew-suite/typescript-shared-config@npm:0.0.4"
+  checksum: 10c0/24cd5ee953f803eecfd2e0cbbfaceb4749e1e77697e1653b1476031809b03c91e8e75c31f38bd83b0b0b9c551e5e21e7f800ef318660df02b4d10e8558ef84ba
   languageName: node
   linkType: hard
 
